@@ -28,6 +28,15 @@ def recurapc(edgelist, recurlist):
     print("Gamma Function: " + str(gamma))
     discrim = calculateDiscrim(gamma)
     print("Discriminant: " + str(discrim))
+    if len(real_roots(discrim)) == 0:
+        print("case1")
+    else:
+        print("case2")
+        rStar = min(map(lambda x: x if x > 0 else oo,real_roots(discrim)))
+        apc = (1/rStar)**symbols("n")
+    return apc
+
+
 
 
 def calculateSystem(edgelist, recurlist):
@@ -157,8 +166,8 @@ def eliminate(system, symbs, gamma):
             gamma = gamma.subs(symbs[i], sub)
     return eliminate(system, symbs, gamma)
 
-recurlist = [0, 0, 2, 0]
-edgelist = [[0, 1], [0, 2], [1, 3], [2, 3]]
+recurlist = [0, 2, 0, 0]
+edgelist = [[0, 1], [0, 3], [1, 2], [2, 0]]
 #print(calculateSystem(edgelist, recurlist))
 
 print("Recursive APC: " + str(recurapc(edgelist, recurlist)))
