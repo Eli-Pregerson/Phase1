@@ -24,7 +24,7 @@ from sympy import *
 #     return calculateSystem(edgelist, recurlist)
 def recurapc(edgelist, recurlist):
     """Calculates the apc of a recursive function"""
-    gamma = calculateSystem(edgelist, recurlist)
+    gamma = expand(calculateSystem(edgelist, recurlist))
     print("Gamma Function: " + str(gamma))
     discrim = calculateDiscrim(gamma)
     print("Discriminant: " + str(discrim))
@@ -69,6 +69,8 @@ def calculateSystem(edgelist, recurlist):
                 expr = expr + x
             expr = (recurexpr**recurlist[int(startnode)]) * expr #recursion
         system += [expr - sym]
+    print(system)
+    print(symbs)
     gamma = eliminate(system[1:], symbs[1:], system[0])
     return gamma
     # solutions = nonlinsolve(system, symbs)
@@ -119,6 +121,7 @@ def resultant(p, q, symb):
         if  pow > Qpow:
             Qpow = pow
     MatrixArray = []
+    print(Pcoeffs)
     for i in range(Ppow + Qpow):
         MatrixArray += [[0]*(Ppow + Qpow)]
     for i in range(Ppow + 1):
@@ -166,8 +169,8 @@ def eliminate(system, symbs, gamma):
             gamma = gamma.subs(symbs[i], sub)
     return eliminate(system, symbs, gamma)
 
-recurlist = [0, 2, 0, 0]
-edgelist = [[0, 1], [0, 3], [1, 2], [2, 0]]
+recurlist = [0,0,0,0,1,1,0,0]
+edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
 #print(calculateSystem(edgelist, recurlist))
 
 print("Recursive APC: " + str(recurapc(edgelist, recurlist)))
