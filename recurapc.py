@@ -99,7 +99,7 @@ def calculateDiscrim(polynomial):
     maxcoeff = 1
     for arg in domTerm.args:
         if not "T" in str(arg):
-            maxcoeff = arg
+            maxcoeff *= arg
     print(maxcoeff)
     power = int(maxpow*(maxpow-1)/2)
     disc = ((-1)^power)/(maxcoeff)*resultant(polynomial, diff(polynomial, symbols("T")), symbols("T"))
