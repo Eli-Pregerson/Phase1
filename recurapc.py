@@ -113,12 +113,18 @@ def resultant(p, q, symb):
     Qcoeffs = {}
     for term in p.args:
         pow = termPow(term, symb)
-        Pcoeffs[pow] += term/(symb**pow)
+        if pow in Pcoeffs.keys():
+            Pcoeffs[pow] += term/(symb**pow)
+        else:
+            Pcoeffs[pow] = term/(symb**pow)
         if  pow > Ppow:
             Ppow = pow
     for term in q.args:
         pow = termPow(term, symb)
-        Qcoeffs[pow] += term/(symb**pow)
+        if pow in Qcoeffs.keys():
+            Qcoeffs[pow] += term/(symb**pow)
+        else:
+            Qcoeffs[pow] = term/(symb**pow)
         if  pow > Qpow:
             Qpow = pow
     MatrixArray = []
