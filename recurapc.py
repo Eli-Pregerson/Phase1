@@ -47,7 +47,22 @@ def recurapc(edgelist, recurlist):
             genFunc = possibleGenFunc[0]/(1-x)
             print("Generating Function: " + str(genFunc))
         else:
-            print("Oh dear, not sure which generating function is right")
+            print("PANIC PANIC Oh dear, not sure which generating function is right")
+        denominator = 1
+        for factor in genFunc.args:
+            if type(factor) == Pow and factor.args[1] < 0:
+                denominator *= 1/factor
+        denominator = expand(denominator)
+        roots = roots(denominator, multiple=True)
+        exprs = []
+        numRoots = sum(roots)
+        for val in range(numRoots):
+            expr = -taylor(genFunc, val)
+            for rootindex, root in enumerate(roots):
+                for mj in range(roots[root]):
+                    expr += symbols(f"c\-{}\-{}".format(rootindex, mj))*(val**mj)*((1/root)**n)
+            exprs += [expr]
+            # denominatorPow = max([termPow(i, x) for i in  denominator.args])
         apc = "Rhydon"
     else:
         print("case2")
