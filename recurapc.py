@@ -113,7 +113,7 @@ def calculateDiscrim(polynomial):
                 if not "T" in str(arg):
                     newprod *= arg
             maxcoeff += newprod
-    power = int(maxpow*(maxpow-1)/2)
+    power = int(domPow*(domPow-1)/2)
     disc = ((-1)^power)/(maxcoeff)*resultant(polynomial, diff(polynomial, symbols("T")), symbols("T"))
     return disc
 
