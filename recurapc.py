@@ -114,7 +114,7 @@ def calculateDiscrim(polynomial):
                     newprod *= arg
             maxcoeff += newprod
     power = int(domPow*(domPow-1)/2)
-    disc = ((-1)^power)/(maxcoeff)*resultant(polynomial, diff(polynomial, symbols("T")), symbols("T"))
+    disc = ((-1)**power)/(maxcoeff)*resultant(polynomial, diff(polynomial, symbols("T")), symbols("T"))
     return disc
 
 def resultant(p, q, symb):
