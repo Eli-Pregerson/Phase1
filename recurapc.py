@@ -28,7 +28,11 @@ def recurapc(edgelist, recurlist):
     print("Gamma Function: " + str(gamma))
     discrim = calculateDiscrim(gamma)
     print("Discriminant: " + str(discrim))
-    if len(real_roots(discrim)) == 0:
+    try:
+        numroots = len(real_roots(discrim))
+    except:
+        numroots = 0
+    if numroots == 0:
         print("case1")
     else:
         print("case2")
