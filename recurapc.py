@@ -28,6 +28,7 @@ def recurapc(edgelist, recurlist):
     print("Gamma Function: " + str(gamma))
     discrim = calculateDiscrim(gamma)
     print("Discriminant: " + str(discrim))
+    print(real_roots(discrim))
     if len(real_roots(discrim)) == 0:
         print("case1")
     else:
@@ -53,8 +54,10 @@ def calculateSystem(edgelist, recurlist):
     system = []
     x = symbols('x')
     accGF = 1/(1-x)
-    firstnode = symbols("V"+str(edgelist[0][0])) #chr(edgelist[0][0] + 65)
-    recurexpr = firstnode*x
+    # firstnode = symbols("V"+str(edgelist[0][0])) #chr(edgelist[0][0] + 65)
+    # recurexpr = firstnode*x
+    firstnode = symbols("T")
+    recurexpr = firstnode
     symbs = []
     for startnode in edgedict.keys():
         endnodes = edgedict[startnode]
@@ -69,9 +72,7 @@ def calculateSystem(edgelist, recurlist):
                 expr = expr + x
             expr = (recurexpr**recurlist[int(startnode)]) * expr #recursion
         system += [expr - sym]
-    print(system)
-    print(symbs)
-    gamma = eliminate(system[1:], symbs[1:], system[0])
+    gamma = eliminate(system, symbs, symbols("V0")*x - firstnode)
     return gamma
     # solutions = nonlinsolve(system, symbs)
     # possibleGenFunc = []
@@ -93,15 +94,16 @@ def calculateDiscrim(polynomial):
     terms = polynomial.args
     domTerm = polynomial.args[0]
     for term in terms:
-        if termPow(term, "V0") > termPow(domTerm, "V0"):
+        if termPow(term, "T") > termPow(domTerm, "T"):
             domTerm = term
-    maxpow = termPow(domTerm, "V0")
+    maxpow = termPow(domTerm, "T")
     maxcoeff = 1
     for arg in domTerm.args:
-        if not "V0" in str(arg):
+        if not "T" in str(arg):
             maxcoeff = arg
-    power = int(maxpow*(maxpow+1)/2)
-    disc = ((-1)^power)/(maxcoeff)*resultant(polynomial, diff(polynomial, symbols("V0")), symbols("V0"))
+    print(maxcoeff)
+    power = int(maxpow*(maxpow-1)/2)
+    disc = ((-1)^power)/(maxcoeff)*resultant(polynomial, diff(polynomial, symbols("T")), symbols("T"))
     return disc
 
 def resultant(p, q, symb):
@@ -121,7 +123,6 @@ def resultant(p, q, symb):
         if  pow > Qpow:
             Qpow = pow
     MatrixArray = []
-    print(Pcoeffs)
     for i in range(Ppow + Qpow):
         MatrixArray += [[0]*(Ppow + Qpow)]
     for i in range(Ppow + 1):
@@ -137,14 +138,14 @@ def resultant(p, q, symb):
 def termPow(term, symb):
     """for a expression, find the power a symbol is raised to"""
     #print(str(term) + str(type(term)))
-    if not "V0" in str(term):
+    if not str(symb) in str(term):
         return 0
-    if not "V0**" in str(term):
+    if not str(symb)+"**" in str(term):
         return 1
     if type(term) == Mul:
         args = term.args
         for arg in args:
-            if "V0" in str(arg):
+            if str(symb) in str(arg):
                 return termPow(arg, symb)
     if type(term) == Pow:
         return int(str(term).split("**")[1])
@@ -156,6 +157,7 @@ def termPow(term, symb):
 
 
 def eliminate(system, symbs, gamma):
+    print(system, symbs, gamma)
     """Takes in a system of equations and gets the gamma function"""
     done = True
     for symb in symbs:
@@ -166,11 +168,15 @@ def eliminate(system, symbs, gamma):
     for i in range(len(symbs)):
         sub = system[i] + symbs[i]
         if str(symbs[i]) in str(gamma):
-            gamma = gamma.subs(symbs[i], sub)
+            gamma = expand(gamma.subs(symbs[i], sub))
     return eliminate(system, symbs, gamma)
 
-recurlist = [0,0,0,0,1,1,0,0]
-edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
+# recurlist = [0,0,0,0,1,1,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
+recurlist = [0,0,0,0,1,0]
+edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
+# recurlist = [0,0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
 #print(calculateSystem(edgelist, recurlist))
 
 print("Recursive APC: " + str(recurapc(edgelist, recurlist)))
