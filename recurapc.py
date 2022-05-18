@@ -91,17 +91,29 @@ def calculateSystem(edgelist, recurlist):
 
 def calculateDiscrim(polynomial):
     """Takes in a polynomial and calculates its discriminant"""
+    # terms = polynomial.args
+    # domTerm = polynomial.args[0]
+    # for term in terms:
+    #     if termPow(term, "T") > termPow(domTerm, "T"):
+    #         domTerm = term
+    # maxpow = termPow(domTerm, "T")
+    # maxcoeff = 1
+    # for arg in domTerm.args:
+    #     if not "T" in str(arg):
+    #         maxcoeff *= arg
+    # print(maxcoeff)
+
+
     terms = polynomial.args
-    domTerm = polynomial.args[0]
+    domPow = max([termPow(term, "T") for term in terms])
+    maxcoeff = 0
     for term in terms:
-        if termPow(term, "T") > termPow(domTerm, "T"):
-            domTerm = term
-    maxpow = termPow(domTerm, "T")
-    maxcoeff = 1
-    for arg in domTerm.args:
-        if not "T" in str(arg):
-            maxcoeff = arg
-    print(maxcoeff)
+        if termPow(term, "T") == domPow:
+            newprod = 1
+            for arg in term.args:
+                if not "T" in str(arg):
+                    newprod *= arg
+            maxcoeff += newprod
     power = int(maxpow*(maxpow-1)/2)
     disc = ((-1)^power)/(maxcoeff)*resultant(polynomial, diff(polynomial, symbols("T")), symbols("T"))
     return disc
