@@ -33,7 +33,22 @@ def recurapc(edgelist, recurlist):
     except:
         numroots = 0
     if numroots == 0:
+        T = symbols("T")
+        x = symbols("x")
         print("case1")
+        gens = solve(gamma,T)
+        print("gen funcs:" + str(gens))
+        possibleGenFunc = []
+        for gen in gens:
+            partialSeries = series(gen, x, 0, 40)
+            if "-" not in str(partialSeries):
+                possibleGenFunc += [gen]
+        if len(possibleGenFunc) == 1:
+            genFunc = possibleGenFunc[0]/(1-x)
+            print("Generating Function: " + str(genFunc))
+        else:
+            print("Oh dear, not sure which generating function is right")
+        apc = "Rhydon"
     else:
         print("case2")
         rStar = min(map(lambda x: x if x > 0 else oo,real_roots(discrim)))
@@ -195,10 +210,10 @@ def eliminate(system, symbs, gamma):
 
 # recurlist = [0,0,0,0,1,1,0,0]
 # edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
-recurlist = [0,0,0,0,1,0]
-edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
-# recurlist = [0,0,0,0,0,1,0]
-# edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
+# recurlist = [0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
+recurlist = [0,0,0,0,0,1,0]
+edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
 #print(calculateSystem(edgelist, recurlist))
 
 print("Recursive APC: " + str(recurapc(edgelist, recurlist)))
