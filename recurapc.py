@@ -138,10 +138,12 @@ def resultant(p, q, symb):
         MatrixArray += [[0]*(Ppow + Qpow)]
     for i in range(Ppow + 1):
         for j in range(Qpow):
-            MatrixArray[j][i + j] = Pcoeffs[i]
+            if i in Pcoeffs.keys():
+                MatrixArray[j][i + j] = Pcoeffs[i]
     for i in range(Qpow + 1):
         for j in range(Ppow):
-            MatrixArray[j + Qpow][i +j] = Qcoeffs[i]
+            if i in Qcoeffs.keys():
+                MatrixArray[j + Qpow][i +j] = Qcoeffs[i]
     m = Matrix(MatrixArray)
     m = m.T
     return m.det()
