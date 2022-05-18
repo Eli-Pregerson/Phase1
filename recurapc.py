@@ -28,7 +28,6 @@ def recurapc(edgelist, recurlist):
     print("Gamma Function: " + str(gamma))
     discrim = calculateDiscrim(gamma)
     print("Discriminant: " + str(discrim))
-    print(real_roots(discrim))
     if len(real_roots(discrim)) == 0:
         print("case1")
     else:
@@ -126,12 +125,12 @@ def resultant(p, q, symb):
     Qcoeffs = {}
     for term in p.args:
         pow = termPow(term, symb)
-        Pcoeffs[pow] = term/(symb**pow)
+        Pcoeffs[pow] += term/(symb**pow)
         if  pow > Ppow:
             Ppow = pow
     for term in q.args:
         pow = termPow(term, symb)
-        Qcoeffs[pow] = term/(symb**pow)
+        Qcoeffs[pow] += term/(symb**pow)
         if  pow > Qpow:
             Qpow = pow
     MatrixArray = []
@@ -169,7 +168,6 @@ def termPow(term, symb):
 
 
 def eliminate(system, symbs, gamma):
-    print(system, symbs, gamma)
     """Takes in a system of equations and gets the gamma function"""
     done = True
     for symb in symbs:
