@@ -57,21 +57,24 @@ def recurapc(edgelist, recurlist):
         exprs = []
         numRoots = sum(rootsDict.values())
         print(numRoots)
+        coeffs = [0]*numRoots
+        print(series(genFunc, x, 0, numRoots).args)
+        for term in series(genFunc, x, 0, numRoots).args:
+            if not type(term) == Order:
+                k = str(term).split("*")[0]
+                if k == "x":
+                    k = "1"
+                coeffs[termPow(term, x)] = int(k)
+        print(coeffs)
         for val in range(numRoots):
-            expr = -series(genFunc, x, 0, 20).args
-            for term in expr:
-                if not type(term) == Order and termPow(term, x):
-                    k = str(term).split("*")[0]
-                    if k == "x":
-                        k = "1"
-                    print(k)
+            expr = -coeffs[val]
             print(expr)
             for rootindex, root in enumerate(rootsDict.keys()):
                 for mj in range(rootsDict[root]):
                     expr += symbols(f'c\-{rootindex}\-{mj}')*(val**mj)*((1/root)**val)
             exprs += [expr]
             # denominatorPow = max([termPow(i, x) for i in  denominator.args])
-        apc = "Gulpin"
+        apc = "slugma"
     else:
         print("case2")
         rStar = min(map(lambda x: x if x > 0 else oo,real_roots(discrim)))
