@@ -75,12 +75,12 @@ def recurapc(edgelist, recurlist):
             exprs += [expr]
             # denominatorPow = max([termPow(i, x) for i in  denominator.args])
         solutions = solve(exprs)
+        patheq = 0
         for rootindex, root in enumerate(rootsDict.keys()):
-            patheq = 0
             for mj in range(rootsDict[root]):
                 n = symbols("n")
-                patheq += symbols(f'c\-{rootindex}\-{mj}')*(n**mj)*((1/root)**n)
-
+                patheq += symbols(f'c\-{rootindex}\-{mj}')*(n**mj)*(abs(1/root)**n)
+        print(patheq)
         patheq = patheq.subs(solutions)
         apc = patheq
     else:
@@ -242,10 +242,10 @@ def eliminate(system, symbs, gamma):
             gamma = expand(gamma.subs(symbs[i], sub))
     return eliminate(system, symbs, gamma)
 
-# recurlist = [0,0,0,0,1,1,0,0]
-# edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
-recurlist = [0,0,0,0,1,0]
-edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
+recurlist = [0,0,0,0,1,1,0,0]
+edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
+# recurlist = [0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
 # recurlist = [0,0,0,0,0,1,0]
 # edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
 #print(calculateSystem(edgelist, recurlist))
