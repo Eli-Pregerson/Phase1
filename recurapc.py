@@ -55,6 +55,7 @@ def recurapc(edgelist, recurlist):
         denominator = expand(denominator)
         rootsDict = roots(denominator)
         exprs = []
+        vars =
         numRoots = sum(rootsDict.values())
         print(numRoots)
         for val in range(numRoots):
@@ -66,12 +67,21 @@ def recurapc(edgelist, recurlist):
                         k = "1"
                     print(k)
             print(expr)
+            expr = 0
             for rootindex, root in enumerate(rootsDict.keys()):
                 for mj in range(rootsDict[root]):
                     expr += symbols(f'c\-{rootindex}\-{mj}')*(val**mj)*((1/root)**val)
             exprs += [expr]
             # denominatorPow = max([termPow(i, x) for i in  denominator.args])
-        apc = "Gulpin"
+        solutions = solve(exprs)
+        for rootindex, root in enumerate(rootsDict.keys()):
+            patheq = 0
+            for mj in range(rootsDict[root]):
+                n = symbols("n")
+                patheq += symbols(f'c\-{rootindex}\-{mj}')*(n**mj)*((1/root)**n)
+
+        patheq = patheq.subs(solutions)
+        apc = patheq
     else:
         print("case2")
         rStar = min(map(lambda x: x if x > 0 else oo,real_roots(discrim)))
@@ -233,10 +243,10 @@ def eliminate(system, symbs, gamma):
 
 # recurlist = [0,0,0,0,1,1,0,0]
 # edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
-# recurlist = [0,0,0,0,1,0]
-# edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
-recurlist = [0,0,0,0,0,1,0]
-edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
+recurlist = [0,0,0,0,1,0]
+edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
+# recurlist = [0,0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
 #print(calculateSystem(edgelist, recurlist))
 
 print("Recursive APC: " + str(recurapc(edgelist, recurlist)))
