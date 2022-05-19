@@ -850,7 +850,7 @@ def _unsolved_syms(eq, symbols, known_symbols=set([]), sort=False):
     >>> _unsolved_syms(eq, [x, y, z], [x, y, z])
     set()
     """
-    from sympy.core.compatibility import default_sort_key
+    from sympy import default_sort_key
     free = eq.free_symbols
     unsolved = (free - set(known_symbols)) & set(symbols)
     if sort:
@@ -879,7 +879,7 @@ def _sort_eqs(system, all_symbols, known_symbols=set([])):
     >>> eqs_dict
     {z: set([z]), x + y: set([x, y]), x + y + z: set([x, y, z])}
     """
-    from sympy.core.compatibility import ordered
+    from sympy import ordered
     _eq_unsolved_sym = {}
     for eq in system:
         _eq_unsolved_sym[eq] = _unsolved_syms(eq, all_symbols, known_symbols)

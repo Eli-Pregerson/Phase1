@@ -57,19 +57,15 @@ def recurapc(edgelist, recurlist):
         rootsDict = roots(denominator)
         exprs = []
         numRoots = sum(rootsDict.values())
-        print(numRoots)
         coeffs = [0]*numRoots
-        print(series(genFunc, x, 0, numRoots).args)
         for term in series(genFunc, x, 0, numRoots).args:
             if not type(term) == Order:
                 k = str(term).split("*")[0]
                 if k == "x":
                     k = "1"
                 coeffs[termPow(term, x)] = int(k)
-        print(coeffs)
         for val in range(numRoots):
             expr = -coeffs[val]
-            print(expr)
             for rootindex, root in enumerate(rootsDict.keys()):
                 for mj in range(rootsDict[root]):
                     expr += symbols(f'c\-{rootindex}\-{mj}')*(val**mj)*((1/root)**val)
@@ -81,7 +77,6 @@ def recurapc(edgelist, recurlist):
             for mj in range(rootsDict[root]):
                 n = symbols("n")
                 patheq += symbols(f'c\-{rootindex}\-{mj}')*(n**mj)*(abs(1/root)**n)
-        print(patheq)
         patheq = patheq.subs(solutions)
         apc = patheq
     else:
@@ -125,13 +120,9 @@ def calculateSystem(edgelist, recurlist):
                 expr = expr + x
             expr = (recurexpr**recurlist[int(startnode)]) * expr #recursion
         system += [expr - sym]
-    print("yes")
-    print(system)
     eq1 = symbols("V0")*x - firstnode
     # gamma = eliminate(system+[eq1], symbs, eq1)
     gamma = list(eliminate(system+[eq1], *symbs))[0]
-    print(gamma)
-    print("no")
     return gamma
     # solutions = nonlinsolve(system, symbs)
     # possibleGenFunc = []
