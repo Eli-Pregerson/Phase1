@@ -71,7 +71,9 @@ def recurapc(edgelist, recurlist):
                     expr += symbols(f'c\-{rootindex}\-{mj}')*(val**mj)*((1/root)**val)
             exprs += [expr]
             # denominatorPow = max([termPow(i, x) for i in  denominator.args])
+        print(5)
         solutions = solve(exprs)
+        print(4)
         patheq = 0
         for rootindex, root in enumerate(rootsDict.keys()):
             for mj in range(rootsDict[root]):
@@ -327,7 +329,35 @@ def termPow(term, symb):
 # recurlist = [0,0,0,0,0,1,0]
 # edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
 #print(calculateSystem(edgelist, recurlist))
-recurlist = [0,0,0,0,0]
-edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]
+
+
+# recurlist = [0,0,0,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]
+
+
+
+# bin2dec = {{0, 1, 0, f}, {1, 2, 0, f}, {1, 3, 0, f}, {2, 6, 0, t}, {3,
+#      4, 0, f}, {3, 5, 0, f}, {4, 6, 1, t}, {5, 6, 1, t}};
+
+recurlist = [0,0,0,0,1,1,0]
+edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
+
+# crossSum = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 3, 0, t}, {2, 3, 1, t}};
+# recurlist = [0,0,1,0]
+# edgelist = [[0,1],[0,2],[1,3],[2,3]]
+
+# fact = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 3, 0, t}, {2, 3, 1, t}};
+# recurlist = [0,0,1,0]
+# edgelist = [[0,1],[0,2],[1,3],[2,3]]
+
+# power = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 5, 0, t}, {2, 3, 0, f}, {2,
+#     4, 0, f}, {3, 5, 0, t}, {4, 5, 1, t}};
+# recurlist = [0,0,0,0,1,0]
+# edgelist = [[0,1],[0,2],[1,5],[2,3],[2,4],[3,5],[4,5]]
+
+
+# recurlist = [0,0,2,0]
+# edgelist = [[0,1],[0,2],[1,3],[2,3]]
+# fib = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 3, 0, t}, {2, 3, 2, t}};
 
 print("Recursive APC: " + str(recurapc(edgelist, recurlist)))
