@@ -56,6 +56,7 @@ def recurapc(edgelist, recurlist):
         denominator = expand(denominator)
         rootsDict = roots(denominator)
         exprs = []
+        symbs = set()
         numRoots = sum(rootsDict.values())
         coeffs = [0]*numRoots
         Tseries = series(genFunc, x, 0, numRoots)
@@ -72,6 +73,7 @@ def recurapc(edgelist, recurlist):
             for rootindex, root in enumerate(rootsDict.keys()):
                 for mj in range(rootsDict[root]):
                     expr += symbols(f'c\-{rootindex}\-{mj}')*(val**mj)*((1/root)**val)
+                    symbs.add(symbols(f'c\-{rootindex}\-{mj}'))
             exprs += [expr]
             # denominatorPow = max([termPow(i, x) for i in  denominator.args])
         print(5)
@@ -79,7 +81,7 @@ def recurapc(edgelist, recurlist):
             print(i)
             print(":ASDFADSFADS")
         print(exprs)
-        solutions = solve(exprs)
+        solutions = nsolve(exprs, list(symbs), [0]*numRoots, dict=True)
         print(4)
         patheq = 0
         for rootindex, root in enumerate(rootsDict.keys()):
@@ -133,7 +135,6 @@ def calculateSystem(edgelist, recurlist):
     eq1 = symbols("V0")*x - firstnode
     symbs = [firstnode]+symbs
     # gamma = eliminate(system+[eq1], symbs, eq1)
-    print(eliminate([eq1]+system, symbs))
     gamma = eliminate([eq1]+system, symbs)
     return gamma
     # solutions = nonlinsolve(system, symbs)
@@ -272,8 +273,8 @@ def eliminate(system, symbs):
 
 # bin2dec = {{0, 1, 0, f}, {1, 2, 0, f}, {1, 3, 0, f}, {2, 6, 0, t}, {3,
 #      4, 0, f}, {3, 5, 0, f}, {4, 6, 1, t}, {5, 6, 1, t}};
-# recurlist = [0,0,0,0,1,1,0]
-# edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
+recurlist = [0,0,0,0,1,1,0]
+edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
 
 # crossSum = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 3, 0, t}, {2, 3, 1, t}};
 # recurlist = [0,0,1,0]
@@ -296,21 +297,21 @@ def eliminate(system, symbs):
 #non recursive example 1
 # recurlist = [0,0,0,0,0,0,0]
 # edgelist = [[0,1],[0,2],[1,2],[2,3],[2,4],[3,4],[4,5],[4,6],[5,6]]
+#
+print("Recursive APC: " + str(recurapc(edgelist, recurlist)))
 
-# print("Recursive APC: " + str(recurapc(edgelist, recurlist)))
-
-recurlist = [0,0,0,0,0,0,0]
-edgelist = [[0,1],[0,2],[1,2],[2,3],[2,4],[3,4],[4,5],[4,6],[5,6]]
-print("3 if else sequence APC: " + str(recurapc(edgelist, recurlist)))
-
-recurlist = [0,0,0,0,0,0,0]
-edgelist = [[0,1],[0,6],[1,2],[1,5],[2,3],[2,4],[3,4],[4,5],[5,6]]
-print("3 if else nested APC: " + str(recurapc(edgelist, recurlist)))
-
-recurlist = [0,0,0,0,0]
-edgelist = [[0,0],[0,1],[1,1],[1,2],[2,2],[2,3],[3,3],[3,4],[4,4]]
-print("4 loop sequence APC: " + str(recurapc(edgelist, recurlist)))
-
-recurlist = [0,0,0,0,0]
-edgelist = [[0,1],[1,0],[1,2],[2,1],[2,3],[3,2],[3,4],[4,3]]
-print("4 loop nested APC: " + str(recurapc(edgelist, recurlist)))
+# recurlist = [0,0,0,0,0,0,0]
+# edgelist = [[0,1],[0,2],[1,2],[2,3],[2,4],[3,4],[4,5],[4,6],[5,6]]
+# print("3 if else sequence APC: " + str(recurapc(edgelist, recurlist)))
+#
+# recurlist = [0,0,0,0,0,0,0]
+# edgelist = [[0,1],[0,6],[1,2],[1,5],[2,3],[2,4],[3,4],[4,5],[5,6]]
+# print("3 if else nested APC: " + str(recurapc(edgelist, recurlist)))
+#
+# recurlist = [0,0,0,0,0]
+# edgelist = [[0,0],[0,1],[1,1],[1,2],[2,2],[2,3],[3,3],[3,4],[4,4]]
+# print("4 loop sequence APC: " + str(recurapc(edgelist, recurlist)))
+#
+# recurlist = [0,0,0,0,0]
+# edgelist = [[0,1],[1,0],[1,2],[2,1],[2,3],[3,2],[3,4],[4,3]]
+# print("4 loop nested APC: " + str(recurapc(edgelist, recurlist)))
