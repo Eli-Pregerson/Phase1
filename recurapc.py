@@ -1,4 +1,5 @@
 from sympy import *
+import signal
 # from eliminate import eliminate
 
 
@@ -17,7 +18,6 @@ def recurapc(edgelist, recurlist):
         x = symbols("x")
         print("case1")
         gens = solve(gamma,T)
-        print("gen funcs:" + str(gens))
         possibleGenFunc = []
         for gen in gens:
             partialSeries = series(gen, x, 0, 40)
@@ -33,10 +33,13 @@ def recurapc(edgelist, recurlist):
             if type(factor) == Pow and factor.args[1] < 0:
                 denominator *= 1/factor
         denominator = expand(denominator)
+        print(denominator)
         rootsDict = roots(denominator)
+        print(roots(denominator))
         exprs = []
         symbs = set()
         numRoots = sum(rootsDict.values())
+        print(numRoots)
         coeffs = [0]*numRoots
         Tseries = series(genFunc, x, 0, numRoots)
         if not type(Tseries) == Order:
@@ -46,6 +49,7 @@ def recurapc(edgelist, recurlist):
                     if k == "x":
                         k = "1"
                     coeffs[termPow(term, x)] = int(k)
+        print(coeffs)
         for val in range(numRoots):
             expr = -coeffs[val]
             for rootindex, root in enumerate(rootsDict.keys()):
@@ -53,13 +57,14 @@ def recurapc(edgelist, recurlist):
                     expr += symbols(f'c\-{rootindex}\-{mj}')*(val**mj)*((1/root)**val)
                     symbs.add(symbols(f'c\-{rootindex}\-{mj}'))
             exprs += [expr]
-        import signal
+
 
         def handler(signum, frame):
             raise Exception("end of time")
 
         signal.signal(signal.SIGALRM, handler)
         signal.alarm(200)
+        print(exprs)
         try:
             solutions = solve(exprs)
         except:
@@ -79,9 +84,7 @@ def recurapc(edgelist, recurlist):
         apc = (1/rStar)**symbols("n")
     return apc
 
-
-
-
+    
 def gammaFunction(edgelist, recurlist):
     """Takes in a list of all edges in a graph, and a list of where recursive calls are
     located, and calculates a gamma function in terms of x and the start node"""
@@ -221,10 +224,9 @@ def eliminate(system, symbs):
 # recurlist = [0,0,0,0,0]
 # edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]
 
-
 #This comes from the 2022 paper and apc should be O(1.15^n)
 #bin2dec = {{0, 1, 0, f}, {1, 2, 0, f}, {1, 3, 0, f}, {2, 6, 0, t}, {3,
-     4, 0, f}, {3, 5, 0, f}, {4, 6, 1, t}, {5, 6, 1, t}};
+#     4, 0, f}, {3, 5, 0, f}, {4, 6, 1, t}, {5, 6, 1, t}};
 recurlist = [0,0,0,0,1,1,0]
 edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
 
@@ -232,7 +234,55 @@ edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
 #crossSum = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 3, 0, t}, {2, 3, 1, t}};
 recurlist = [0,0,1,0]
 edgelist = [[0,1],[0,2],[1,3],[2,3]]
+ecurlist = [0,0,0,0,1,1,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
+# recurlist = [0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
+# recurlist = [0,0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
+#print(gammaFunction(edgelist, recurlist))
 
+
+# recurlist = [0,0,0,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]ecurlist = [0,0,0,0,1,1,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
+# recurlist = [0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
+# recurlist = [0,0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
+#print(gammaFunction(edgelist, recurlist))
+
+ecurlist = [0,0,0,0,1,1,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
+# recurlist = [0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
+# recurlist = [0,0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
+#print(gammaFunction(edgelist, recurlist))
+
+
+# recurlist = [0,0,0,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]ecurlist = [0,0,0,0,1,1,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
+# recurlist = [0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
+# recurlist = [0,0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
+#print(gammaFunction(edgelist, recurlist))
+
+# recurlist = [0,0,0,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]ecurlist = [0,0,0,0,1,1,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
+# recurlist = [0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
+# recurlist = [0,0,0,0,0,1,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
+#print(gammaFunction(edgelist, recurlist))
+
+# recurlist = [0,0,0,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]
+# recurlist = [0,0,0,0,0]
+# edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]
 #This comes from the 2022 paper and apc should be O(n/3)
 #fact = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 3, 0, t}, {2, 3, 1, t}};
 recurlist = [0,0,1,0]
@@ -251,22 +301,22 @@ edgelist = [[0,1],[0,2],[1,3],[2,3]]
 
 # print("Recursive APC: " + str(recurapc(edgelist, recurlist)))
 
-#This comes from the 2015 paper and apc should be 2^3 = 8
-recurlist = [0,0,0,0,0,0,0]
-edgelist = [[0,1],[0,2],[1,2],[2,3],[2,4],[3,4],[4,5],[4,6],[5,6]]
-print("3 if else sequence APC: " + str(recurapc(edgelist, recurlist)))
+# #This comes from the 2015 paper and apc should be 2^3 = 8
+# recurlist = [0,0,0,0,0,0,0]
+# edgelist = [[0,1],[0,2],[1,2],[2,3],[2,4],[3,4],[4,5],[4,6],[5,6]]
+# print("3 if else sequence APC: " + str(recurapc(edgelist, recurlist)))
 
-#This comes from the 2015 paper and apc should be 3+1 = 4
-recurlist = [0,0,0,0,0,0,0]
-edgelist = [[0,1],[0,6],[1,2],[1,5],[2,3],[2,4],[3,4],[4,5],[5,6]]
-print("3 if else nested APC: " + str(recurapc(edgelist, recurlist)))
-
-#This comes from the 2015 paper and apc should be n^4
-recurlist = [0,0,0,0,0]
-edgelist = [[0,0],[0,1],[1,1],[1,2],[2,2],[2,3],[3,3],[3,4],[4,4]]
-print("4 loop sequence APC: " + str(recurapc(edgelist, recurlist)))
-
+# #This comes from the 2015 paper and apc should be 3+1 = 4
+# recurlist = [0,0,0,0,0,0,0]
+# edgelist = [[0,1],[0,6],[1,2],[1,5],[2,3],[2,4],[3,4],[4,5],[5,6]]
+# print("3 if else nested APC: " + str(recurapc(edgelist, recurlist)))
+#
+# #This comes from the 2015 paper and apc should be n^3
+# recurlist = [0,0,0,0,0]
+# edgelist = [[0,0],[0,1],[1,1],[1,2],[2,2],[2,3],[3,3],[3,4]]
+# print("3 loop sequence APC: " + str(recurapc(edgelist, recurlist)))
+#
 #This comes from the 2015 paper and apc should be b^n
 recurlist = [0,0,0,0,0]
-edgelist = [[0,1],[1,0],[1,2],[2,1],[2,3],[3,2],[3,4],[4,3]]
-print("4 loop nested APC: " + str(recurapc(edgelist, recurlist)))
+edgelist = [[0,1],[1,0],[1,2],[2,1],[2,3],[3,2],[3,4]]
+print("3 loop nested APC: " + str(recurapc(edgelist, recurlist)))
