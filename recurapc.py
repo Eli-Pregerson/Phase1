@@ -35,6 +35,7 @@ def recurapc(edgelist, recurlist):
         denominator = expand(denominator)
         rootsDict = roots(denominator)
         exprs = []
+        symbs = set()
         numRoots = sum(rootsDict.values())
         coeffs = [0]*numRoots
         Tseries = series(genFunc, x, 0, numRoots)
@@ -44,21 +45,26 @@ def recurapc(edgelist, recurlist):
                     k = str(term).split("*")[0]
                     if k == "x":
                         k = "1"
-                    print(termPow(term, x))
                     coeffs[termPow(term, x)] = int(k)
         for val in range(numRoots):
             expr = -coeffs[val]
             for rootindex, root in enumerate(rootsDict.keys()):
                 for mj in range(rootsDict[root]):
                     expr += symbols(f'c\-{rootindex}\-{mj}')*(val**mj)*((1/root)**val)
+                    symbs.add(symbols(f'c\-{rootindex}\-{mj}'))
             exprs += [expr]
-        print(5)
-        for i in exprs:
-            print(i)
-            print(":ASDFADSFADS")
-        print(exprs)
-        solutions = solve(exprs)
-        print(4)
+        import signal
+
+        def handler(signum, frame):
+            raise Exception("end of time")
+
+        signal.signal(signal.SIGALRM, handler)
+        signal.alarm(200)
+        try:
+            solutions = solve(exprs)
+        except:
+            solutions = nsolve(exprs, list(symbs), [0]*numRoots, dict=True)[0]
+        signal.alarm(0)
         patheq = 0
         for rootindex, root in enumerate(rootsDict.keys()):
             for mj in range(rootsDict[root]):
@@ -108,7 +114,6 @@ def gammaFunction(edgelist, recurlist):
         system += [expr - sym]
     eq1 = symbols("V0")*x - firstnode
     symbs = [firstnode]+symbs
-    print(eliminate([eq1]+system, symbs))
     gamma = expand(eliminate([eq1]+system, symbs))
     return gamma
 
