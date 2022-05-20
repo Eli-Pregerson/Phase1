@@ -1,31 +1,10 @@
 from sympy import *
 # from eliminate import eliminate
 
-# def readCFG(cfg, recurlist):
-#     """Takes in a dot file, and extracts a list of two entry lists, each of which
-#     represents an edge in the control flow graph. This list, as well as the recurlist
-#     are passed into calculateSystem."""
-#     f = open(cfg, "r")
-#     edgelist = []
-#     for x in f:
-#         start = ""
-#         end = ""
-#         startDone = False
-#         for char in x:
-#             if char.isdigit():
-#                 if startDone:
-#                     end += char
-#                 else:
-#                     start += char
-#             else:
-#                 startDone = True
-#         if end != "": #ignore lines that don't give edges
-#             edgelist += [[int(start), int(end)]]
-#     f.close()
-#     return calculateSystem(edgelist, recurlist)
+
 def recurapc(edgelist, recurlist):
     """Calculates the apc of a recursive function"""
-    gamma = expand(calculateSystem(edgelist, recurlist))
+    gamma = gammaFunction(edgelist, recurlist)
     print("Gamma Function: " + str(gamma))
     discrim = calculateDiscrim(gamma)
     print("Discriminant: " + str(discrim))
@@ -66,7 +45,6 @@ def recurapc(edgelist, recurlist):
                     k = str(term).split("*")[0]
                     if k == "x":
                         k = "1"
-                    print(termPow(term, x))
                     coeffs[termPow(term, x)] = int(k)
         for val in range(numRoots):
             expr = -coeffs[val]
@@ -75,14 +53,18 @@ def recurapc(edgelist, recurlist):
                     expr += symbols(f'c\-{rootindex}\-{mj}')*(val**mj)*((1/root)**val)
                     symbs.add(symbols(f'c\-{rootindex}\-{mj}'))
             exprs += [expr]
-            # denominatorPow = max([termPow(i, x) for i in  denominator.args])
-        print(5)
-        for i in exprs:
-            print(i)
-            print(":ASDFADSFADS")
-        print(exprs)
-        solutions = nsolve(exprs, list(symbs), [0]*numRoots, dict=True)
-        print(4)
+        import signal
+
+        def handler(signum, frame):
+            raise Exception("end of time")
+
+        signal.signal(signal.SIGALRM, handler)
+        signal.alarm(200)
+        try:
+            solutions = solve(exprs)
+        except:
+            solutions = nsolve(exprs, list(symbs), [0]*numRoots, dict=True)[0]
+        signal.alarm(0)
         patheq = 0
         for rootindex, root in enumerate(rootsDict.keys()):
             for mj in range(rootsDict[root]):
@@ -100,9 +82,9 @@ def recurapc(edgelist, recurlist):
 
 
 
-def calculateSystem(edgelist, recurlist):
+def gammaFunction(edgelist, recurlist):
     """Takes in a list of all edges in a graph, and a list of where recursive calls are
-    located, and creates a system of equations in the form of a dictionary"""
+    located, and calculates a gamma function in terms of x and the start node"""
     edgedict = {}
     for edge in edgelist: #reformatting our list of edges into a dictionary where keys are edge starts, and values are lists of edge ends
         startnode = str(edge[0])
@@ -114,8 +96,6 @@ def calculateSystem(edgelist, recurlist):
     system = []
     x = symbols('x')
     accGF = 1/(1-x)
-    # firstnode = symbols("V"+str(edgelist[0][0])) #chr(edgelist[0][0] + 65)
-    # recurexpr = firstnode*x
     firstnode = symbols("T")
     recurexpr = firstnode
     symbs = []
@@ -134,39 +114,12 @@ def calculateSystem(edgelist, recurlist):
         system += [expr - sym]
     eq1 = symbols("V0")*x - firstnode
     symbs = [firstnode]+symbs
-    # gamma = eliminate(system+[eq1], symbs, eq1)
-    gamma = eliminate([eq1]+system, symbs)
+    gamma = expand(eliminate([eq1]+system, symbs))
     return gamma
-    # solutions = nonlinsolve(system, symbs)
-    # possibleGenFunc = []
-    # for i in solutions.args:
-    #     func = i[0]
-    #     sumfunc = accGF*func
-    #     partialSeries = series(sumfunc, x, 0, 40)
-    #     if "-" not in str(partialSeries):
-    #         possibleGenFunc += [sumfunc]
-    # if len(possibleGenFunc) == 1:
-    #     return possibleGenFunc[0]
-    # else:
-    #     print("Oh dear, not sure which generating function is right")
-    #     return possibleGenFunc[0]
 
 
 def calculateDiscrim(polynomial):
     """Takes in a polynomial and calculates its discriminant"""
-    # terms = polynomial.args
-    # domTerm = polynomial.args[0]
-    # for term in terms:
-    #     if termPow(term, "T") > termPow(domTerm, "T"):
-    #         domTerm = term
-    # maxpow = termPow(domTerm, "T")
-    # maxcoeff = 1
-    # for arg in domTerm.args:
-    #     if not "T" in str(arg):
-    #         maxcoeff *= arg
-    # print(maxcoeff)
-
-
     terms = polynomial.args
     domPow = max([termPow(term, "T") for term in terms])
     maxcoeff = 0
@@ -220,7 +173,6 @@ def resultant(p, q, symb):
 
 def termPow(term, symb):
     """for a expression, find the power a symbol is raised to"""
-    #print(str(term) + str(type(term)))
     if not str(symb) in str(term):
         return 0
     if not str(symb)+"**" in str(term):
@@ -263,7 +215,7 @@ def eliminate(system, symbs):
 # edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
 # recurlist = [0,0,0,0,0,1,0]
 # edgelist = [[0,1],[1,2],[2,3],[3,4],[3,5],[4,6],[5,6]]
-#print(calculateSystem(edgelist, recurlist))
+#print(gammaFunction(edgelist, recurlist))
 
 
 # recurlist = [0,0,0,0,0]
@@ -273,8 +225,8 @@ def eliminate(system, symbs):
 
 # bin2dec = {{0, 1, 0, f}, {1, 2, 0, f}, {1, 3, 0, f}, {2, 6, 0, t}, {3,
 #      4, 0, f}, {3, 5, 0, f}, {4, 6, 1, t}, {5, 6, 1, t}};
-recurlist = [0,0,0,0,1,1,0]
-edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
+# recurlist = [0,0,0,0,1,1,0]
+# edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
 
 # crossSum = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 3, 0, t}, {2, 3, 1, t}};
 # recurlist = [0,0,1,0]
