@@ -1,5 +1,5 @@
 from sympy import *
-from eliminate import eliminate
+# from eliminate import eliminate
 
 # def readCFG(cfg, recurlist):
 #     """Takes in a dot file, and extracts a list of two entry lists, each of which
@@ -72,6 +72,10 @@ def recurapc(edgelist, recurlist):
             exprs += [expr]
             # denominatorPow = max([termPow(i, x) for i in  denominator.args])
         print(5)
+        for i in exprs:
+            print(i)
+            print(":ASDFADSFADS")
+        print(exprs)
         solutions = solve(exprs)
         print(4)
         patheq = 0
@@ -123,8 +127,11 @@ def calculateSystem(edgelist, recurlist):
             expr = (recurexpr**recurlist[int(startnode)]) * expr #recursion
         system += [expr - sym]
     eq1 = symbols("V0")*x - firstnode
+    symbs = [firstnode]+symbs
     # gamma = eliminate(system+[eq1], symbs, eq1)
-    gamma = list(eliminate(system+[eq1], *symbs))[0]
+    print([eq1]+system[eq1], symbs)
+    print(eliminate([eq1]+system, *symbs))
+    gamma = eliminate([eq1]+system, *symbs)
     return gamma
     # solutions = nonlinsolve(system, symbs)
     # possibleGenFunc = []
@@ -321,6 +328,25 @@ def termPow(term, symb):
 #             gamma = expand(gamma.subs(symbs[i], sub))
 #     return eliminate(system, symbs, gamma)
 
+def eliminate(system, symbs):
+    """Takes in a system of equations and gets the gamma function"""
+    if len(system) == 1:
+        return system[0]
+    sub = system[-1] + symbs[-1]
+    if symbs[-1] in sub.free_symbols:
+        for eq in system:
+            if symbs[-1] in eq.free_symbols:
+                sol = solve(eq, symbs[-1], dict=True)
+                if len(sol) == 1:
+                    sub = expand(sub.subs(symbs[-1], sol[0][symbs[-1]]))
+    if symbs[-1] in sub.free_symbols:
+        print("PANIC PANIC not sure how to substitute")
+        return 98287340987134
+    for eq in system:
+        if symbs[-1] in eq.free_symbols:
+            eq = expand(eq.subs(symbs[-1], sub))
+    return eliminate(system[-1], symbs[-1])
+
 
 # recurlist = [0,0,0,0,1,1,0,0]
 # edgelist = [[0,1],[1,2],[2,3],[3,7],[2,4],[4,5],[5,6],[6,7]]
@@ -331,14 +357,13 @@ def termPow(term, symb):
 #print(calculateSystem(edgelist, recurlist))
 
 
-# recurlist = [0,0,0,0,0]
-# edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]
+recurlist = [0,0,0,0,0]
+edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]
 
 
 
 # bin2dec = {{0, 1, 0, f}, {1, 2, 0, f}, {1, 3, 0, f}, {2, 6, 0, t}, {3,
 #      4, 0, f}, {3, 5, 0, f}, {4, 6, 1, t}, {5, 6, 1, t}};
-
 recurlist = [0,0,0,0,1,1,0]
 edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
 
@@ -359,5 +384,9 @@ edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
 # recurlist = [0,0,2,0]
 # edgelist = [[0,1],[0,2],[1,3],[2,3]]
 # fib = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 3, 0, t}, {2, 3, 2, t}};
+
+#non recursive example 1
+# recurlist = [0,0,0,0,0,0,0]
+# edgelist = [[0,1],[0,2],[1,2],[2,3],[2,4],[3,4],[4,5],[4,6],[5,6]]
 
 print("Recursive APC: " + str(recurapc(edgelist, recurlist)))
