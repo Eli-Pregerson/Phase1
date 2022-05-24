@@ -33,6 +33,7 @@ def recurapc(edgelist, recurlist):
             if type(factor) == Pow and factor.args[1] < 0:
                 denominator *= 1/factor
         denominator = expand(denominator)
+        print(denominator)
         maxPow = 0
         for term in denominator.args:
             power = termPow(term, symbols("x"))
@@ -55,19 +56,25 @@ def recurapc(edgelist, recurlist):
             numRoots = sum(rootsDict.values())
         if numRoots < maxPow:
             raise Exception("Can't find all the roots :(")
-        coeffs = [0]*numRoots
-        Tseries = series(genFunc, x, 0, numRoots)
+        nonZeroIndex = 0
+        while True:
+            zseries = series(genFunc, x, 0, nonZeroIndex)
+            if not type(zseries) == Order:
+                break
+            nonZeroIndex += 1
+        coeffs = [0]*(numRoots + nonZeroIndex)
+        Tseries = series(genFunc, x, 0, numRoots + nonZeroIndex)
         exprs = []
         symbs = set()
-        if not type(Tseries) == Order:
-            for term in series(genFunc, x, 0, numRoots).args:
-                if not type(term) == Order:
-                    k = str(term).split("*")[0]
-                    if k == "x":
-                        k = "1"
-                    coeffs[termPow(term, x)] = int(k)
-        for val in range(numRoots):
+        for term in Tseries.args:
+            if not type(term) == Order:
+                c = str(term).split("*")[0]
+                if c == "x":
+                    c = "1"
+                coeffs[termPow(term, x)] = int(c)
+        for val in range(nonZeroIndex, nonZeroIndex + numRoots):
             expr = -coeffs[val]
+
             for rootindex, root in enumerate(rootsDict.keys()):
                 for mj in range(rootsDict[root]):
                     expr += symbols(f'c\-{rootindex}\-{mj}')*(val**mj)*((1/root)**val)
@@ -227,83 +234,83 @@ def eliminate(system, symbs):
             system[count] = expand(eq.subs(symbs[-1], sub))
     return eliminate(system[:-1], symbs[:-1])
 
-# recurlist = [0,0,0,0,1,1,0,0]
-# edgelist = [[0,1],[1,2],[2,3],[2,4],[3,7],[4,5],[5,6],[6,7]]
-# print("This comes from the 2022 paper and apc should be O(1.12^n)")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
-#
-#
-# recurlist = [0,0,0,0,1,0]
-# edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
-# print("This comes from the 2022 paper and apc should be O(n/5)")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
-#
-#
-# recurlist = [0,0,0,0,0]
-# edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]
-# print("This comes from the 2015 paper and apc should be O(n/3)")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
-#
-#
-# #bin2dec = {{0, 1, 0, f}, {1, 2, 0, f}, {1, 3, 0, f}, {2, 6, 0, t}, {3,
-#      # 4, 0, f}, {3, 5, 0, f}, {4, 6, 1, t}, {5, 6, 1, t}};
-# recurlist = [0,0,0,0,1,1,0]
-# edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
-# print("This comes from the 2022 paper and apc should be O(1.15^n)")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
-#
-#
-# #crossSum = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 3, 0, t}, {2, 3, 1, t}};
-# recurlist = [0,0,1,0]
-# edgelist = [[0,1],[0,2],[1,3],[2,3]]
-# print("This comes from the 2022 paper and apc should be O(n/3)")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
-#
-#
-#
-#
-# #power = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 5, 0, t}, {2, 3, 0, f}, {2,
-# #    4, 0, f}, {3, 5, 0, t}, {4, 5, 1, t}};
-# recurlist = [0,0,0,0,1,0]
-# edgelist = [[0,1],[0,2],[1,5],[2,3],[2,4],[3,5],[4,5]]
-# print("This comes from the 2022 paper and apc should be O(n/2)")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
-#
-#
-#
-#
-#
-#
-#
-# recurlist = [0,0,0,0,0,0,0]
-# edgelist = [[0,1],[0,2],[1,2],[2,3],[2,4],[3,4],[4,5],[4,6],[5,6]]
-# print("This comes from the 2015 paper and apc should be 2^3 = 8")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
-#
-#
-#
-# recurlist = [0,0,0,0,0,0,0]
-# edgelist = [[0,1],[0,6],[1,2],[1,5],[2,3],[2,4],[3,4],[4,5],[5,6]]
-# print("This comes from the 2015 paper and apc should be 3+1 = 4")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
-#
-#
-# recurlist = [0,0,0,0,0]
-# edgelist = [[0,0],[0,1],[1,1],[1,2],[2,2],[2,3],[3,3],[3,4],[4,4]]
-# print("This comes from the 2015 paper and apc should be n^4")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
-#
-#
-# recurlist = [0,0,0,0,0]
-# edgelist = [[0,0],[0,1],[1,1],[1,2],[2,2],[2,3],[3,3],[3,4]]
-# print("This comes from the 2015 paper and apc should be n^3")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
-#
-#
-# recurlist = [0,0,0,0,0,0,0,0,0]
-# edgelist = [[0,1],[1,2],[2,8],[1,3],[3,4],[3,5],[5,8],[4,6],[4,7],[6,8],[7,8]]
-# print("This comes from the 2015 paper and apc should be 4")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
+recurlist = [0,0,0,0,1,1,0,0]
+edgelist = [[0,1],[1,2],[2,3],[2,4],[3,7],[4,5],[5,6],[6,7]]
+print("This comes from the 2022 paper and apc should be O(1.12^n)")
+print("APC: " + str(recurapc(edgelist, recurlist)))
+
+
+recurlist = [0,0,0,0,1,0]
+edgelist = [[0,1],[1,2],[2,3],[2,4],[3,5],[4,5]]
+print("This comes from the 2022 paper and apc should be O(n/5)")
+print("APC: " + str(recurapc(edgelist, recurlist)))
+
+
+recurlist = [0,0,0,0,0]
+edgelist = [[0,1],[1,2],[2,3],[3,1],[1,4]]
+print("This comes from the 2015 paper and apc should be O(n/3)")
+print("APC: " + str(recurapc(edgelist, recurlist)))
+
+
+#bin2dec = {{0, 1, 0, f}, {1, 2, 0, f}, {1, 3, 0, f}, {2, 6, 0, t}, {3,
+     # 4, 0, f}, {3, 5, 0, f}, {4, 6, 1, t}, {5, 6, 1, t}};
+recurlist = [0,0,0,0,1,1,0]
+edgelist = [[0,1],[1,2],[1,3],[2,6],[3, 4], [3,5], [4,6], [5,6]]
+print("This comes from the 2022 paper and apc should be O(1.15^n)")
+print("APC: " + str(recurapc(edgelist, recurlist)))
+
+
+#crossSum = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 3, 0, t}, {2, 3, 1, t}};
+recurlist = [0,0,1,0]
+edgelist = [[0,1],[0,2],[1,3],[2,3]]
+print("This comes from the 2022 paper and apc should be O(n/3)")
+print("APC: " + str(recurapc(edgelist, recurlist)))
+
+
+
+
+#power = {{0, 1, 0, f}, {0, 2, 0, f}, {1, 5, 0, t}, {2, 3, 0, f}, {2,
+#    4, 0, f}, {3, 5, 0, t}, {4, 5, 1, t}};
+recurlist = [0,0,0,0,1,0]
+edgelist = [[0,1],[0,2],[1,5],[2,3],[2,4],[3,5],[4,5]]
+print("This comes from the 2022 paper and apc should be O(n/2)")
+print("APC: " + str(recurapc(edgelist, recurlist)))
+
+
+
+
+
+
+
+recurlist = [0,0,0,0,0,0,0]
+edgelist = [[0,1],[0,2],[1,2],[2,3],[2,4],[3,4],[4,5],[4,6],[5,6]]
+print("This comes from the 2015 paper and apc should be 2^3 = 8")
+print("APC: " + str(recurapc(edgelist, recurlist)))
+
+
+
+recurlist = [0,0,0,0,0,0,0]
+edgelist = [[0,1],[0,6],[1,2],[1,5],[2,3],[2,4],[3,4],[4,5],[5,6]]
+print("This comes from the 2015 paper and apc should be 3+1 = 4")
+print("APC: " + str(recurapc(edgelist, recurlist)))
+
+
+recurlist = [0,0,0,0,0]
+edgelist = [[0,0],[0,1],[1,1],[1,2],[2,2],[2,3],[3,3],[3,4],[4,4]]
+print("This comes from the 2015 paper and apc should be n^4")
+print("APC: " + str(recurapc(edgelist, recurlist)))
+
+
+recurlist = [0,0,0,0,0]
+edgelist = [[0,0],[0,1],[1,1],[1,2],[2,2],[2,3],[3,3],[3,4]]
+print("This comes from the 2015 paper and apc should be n^3")
+print("APC: " + str(recurapc(edgelist, recurlist)))
+
+
+recurlist = [0,0,0,0,0,0,0,0,0]
+edgelist = [[0,1],[1,2],[2,8],[1,3],[3,4],[3,5],[5,8],[4,6],[4,7],[6,8],[7,8]]
+print("This comes from the 2015 paper and apc should be 4")
+print("APC: " + str(recurapc(edgelist, recurlist)))
 
 
 recurlist = [0,0,0,0,0,0,0,0,0]
@@ -311,7 +318,7 @@ edgelist = [[0,1],[1,2],[2,3],[3,2],[2,4],[4,5],[5,6],[6,5],[5,7],[7,8]]
 print("This comes from the 2015 paper and apc should be n^2")
 print("APC: " + str(recurapc(edgelist, recurlist)))
 
-# recurlist = [0,0,0,0,0,0,0,0,0,0,0]
-# edgelist = [[0,1],[1,2],[2,3],[2,4],[4,6],[4,5],[6,8],[6,9],[5,7],[8,10],[9,7],[7,2],[3,10]]
-# print("This comes from the 2015 paper and apc should be 1.17^n")
-# print("APC: " + str(recurapc(edgelist, recurlist)))
+recurlist = [0,0,0,0,0,0,0,0,0,0,0]
+edgelist = [[0,1],[1,2],[2,3],[2,4],[4,6],[4,5],[6,8],[6,9],[5,7],[8,10],[9,7],[7,2],[3,10]]
+print("This comes from the 2015 paper and apc should be 1.17^n")
+print("APC: " + str(recurapc(edgelist, recurlist)))
